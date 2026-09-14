@@ -43,14 +43,13 @@ void exit(int code)
     );
 }
 
-int main()
-{
+int main(){
 
+    // Defino o tam da entrada e leio
     char entrada[33];
-
     read(STDIN_FD, entrada, 33);
 
-    // Sinal
+    // Defino o sinal
     int sinal;
 
     if (entrada[0] == '0') {
@@ -60,7 +59,7 @@ int main()
         sinal = -1;
     }
 
-    // Expoente
+    // Defino o expoente
     int exp = 0;
     int i;
 
@@ -75,31 +74,58 @@ int main()
 
     exp = exp - 127;
 
-    // Mantissa
+    // Defino a Mantissa
     int valormant;
-
     if (exp < 0) {
         valormant = 0;
     }
     else {
-
         valormant = 1;
-
         for (i = 9; i < 9 + exp; i++) {
-
             valormant = valormant * 2;
-
             if (entrada[i] == '1') {
                 valormant = valormant + 1;
             }
         }
     }
-
     valormant = valormant * sinal;
 
-    // Decimal para binario
-    int numero;
+    // Imprimo como char
+    char print_int[12]; // Pois, o menor int de 32 bits como char é: -2147483648\n
+    char temp[12];
 
+    int pos = 0;
+    int tam = 0;
+    numero = valormant;
+
+    if (numero < 0) {
+        print_int[pos] = '-';
+        pos++;
+        numero = -numero;
+    }
+    if (numero == 0) {
+        print_int[pos] = '0';
+        pos++;
+    }
+    else {
+        while (numero > 0) {
+            temp[tam] = (numero % 10) + '0';
+            numero = numero / 10;
+            tam++;
+        }
+        for (i = tam - 1; i >= 0; i--) {
+            print_int[pos] = temp[i];
+            pos++;
+        }
+    }
+
+    print_int[pos] = '\n';
+    pos++;
+    int tam_int = pos;
+    write(STDOUT_FD, print_int, tam_int);
+
+    // Converto de int para b2
+    int numero;
     if (valormant < 0) {
         numero = -valormant;
     }
@@ -108,17 +134,20 @@ int main()
     }
 
     int bin[32];
+    // Fixo
+    bin[0] = '0';
+    bin[1] = 'b';
+    bin[31] = '\n';
 
     for (i = 31; i >= 0; i--) {
         bin[i] = numero % 2;
         numero = numero / 2;
     }
 
-    // Complemento de 2
+    // Caso numero seja negativo, faço o complemento de 2
     if (valormant < 0) {
-
+        // Inverto os bits
         for (i = 0; i < 32; i++) {
-
             if (bin[i] == 0) {
                 bin[i] = 1;
             }
@@ -126,9 +155,8 @@ int main()
                 bin[i] = 0;
             }
         }
-
+        // Somo 1
         for (i = 31; i >= 0; i--) {
-
             if (bin[i] == 0) {
                 bin[i] = 1;
                 break;
@@ -139,95 +167,52 @@ int main()
         }
     }
 
-    // Saida decimal
-    char saida_decimal[12];
-    char temp[12];
-
-    int pos = 0;
-    int tam = 0;
-    numero = valormant;
-
-    if (numero < 0) {
-        saida_decimal[pos] = '-';
-        pos++;
-        numero = -numero;
-    }
-
-    if (numero == 0) {
-        saida_decimal[pos] = '0';
-        pos++;
-    }
-    else {
-
-        while (numero > 0) {
-            temp[tam] = (numero % 10) + '0';
-            numero = numero / 10;
-            tam++;
-        }
-
-        for (i = tam - 1; i >= 0; i--) {
-            saida_decimal[pos] = temp[i];
-            pos++;
-        }
-    }
-
-    saida_decimal[pos] = '\n';
-    pos++;
-
-    int tam_decimal = pos;
-
     // Binario big endian
     char bin_big[35];
 
     bin_big[0] = '0';
     bin_big[1] = 'b';
+    bin_big[34] = '\n';
 
     for (i = 0; i < 32; i++) {
         bin_big[i + 2] = bin[i] + '0';
     }
-
-    bin_big[34] = '\n';
+    write(STDOUT_FD, bin_big, 35);
 
     // Binario little endian
-    char bin_little[35];
+    char bin_lit[35];
 
-    bin_little[0] = '0';
-    bin_little[1] = 'b';
+    bin_lit[0] = '0';
+    bin_lit[1] = 'b';
+    bin_lit[34] = '\n';
 
     pos = 2;
-
     int byte;
 
     for (byte = 3; byte >= 0; byte--) {
-
         for (i = byte * 8; i < byte * 8 + 8; i++) {
-            bin_little[pos] = bin[i] + '0';
+            bin_lit[pos] = bin[i] + '0';
             pos++;
         }
     }
+    write(STDOUT_FD, bin_lit, 35);
 
-    bin_little[34] = '\n';
-
-    // Binario para hexadecimal
+    // Converto de binario para hexadecimal
     char hex[8];
-
-    int grupo;
+    int grupo_de_4;
     int j;
 
     for (i = 0; i < 8; i++) {
-
-        grupo = 0;
-
+        grupo_de_4 = 0;
         for (j = 0; j < 4; j++) {
-            grupo = grupo * 2;
-            grupo = grupo + bin[i * 4 + j];
+            grupo_de_4 = grupo_de_4 * 2;
+            grupo_de_4 = grupo_de_4 + bin[i * 4 + j];
         }
-
-        if (grupo < 10) {
-            hex[i] = grupo + '0';
+        if (grupo_de_4 < 10) {
+            hex[i] = grupo_de_4 + '0';
         }
         else {
-            hex[i] = (grupo - 10) + 'a';
+            hex[i] = (grupo_de_4 - 10) + 'a';
         }
     }
 
@@ -236,37 +221,26 @@ int main()
 
     hex_big[0] = '0';
     hex_big[1] = 'x';
+    hex_big[10] = '\n';
 
     for (i = 0; i < 8; i++) {
         hex_big[i + 2] = hex[i];
     }
-
-    hex_big[10] = '\n';
+    write(STDOUT_FD, hex_big, 11);
 
     // Hexadecimal little endian
-    char hex_little[11];
-
-    hex_little[0] = '0';
-    hex_little[1] = 'x';
+    char hex_lit[11];
+    hex_lit[0] = '0';
+    hex_lit[1] = 'x';
+    hex_lit[10] = '\n';
 
     pos = 2;
-
     for (byte = 3; byte >= 0; byte--) {
-
-        hex_little[pos] = hex[byte * 2];
-        hex_little[pos + 1] = hex[byte * 2 + 1];
-
+        hex_lit[pos] = hex[byte * 2];
+        hex_lit[pos + 1] = hex[byte * 2 + 1];
         pos = pos + 2;
     }
-
-    hex_little[10] = '\n';
-
-    // Prints no final
-    write(STDOUT_FD, saida_decimal, tam_decimal);
-    write(STDOUT_FD, bin_big, 35);
-    write(STDOUT_FD, bin_little, 35);
-    write(STDOUT_FD, hex_big, 11);
-    write(STDOUT_FD, hex_little, 11);
+    write(STDOUT_FD, hex_lit, 11);
 
     return 0;
 }
