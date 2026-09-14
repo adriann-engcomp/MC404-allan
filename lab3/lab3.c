@@ -96,7 +96,7 @@ int main(){
 
     int pos = 0;
     int tam = 0;
-    numero = valormant;
+    int numero = valormant;
 
     if (numero < 0) {
         print_int[pos] = '-';
@@ -121,30 +121,21 @@ int main(){
 
     print_int[pos] = '\n';
     pos++;
-    int tam_int = pos;
-    write(STDOUT_FD, print_int, tam_int);
+    write(STDOUT_FD, print_int, pos);
 
     // Converto de int para b2
-    int numero;
     if (valormant < 0) {
         numero = -valormant;
     }
     else {
         numero = valormant;
     }
-
     int bin[32];
-    // Fixo
-    bin[0] = '0';
-    bin[1] = 'b';
-    bin[31] = '\n';
-
     for (i = 31; i >= 0; i--) {
         bin[i] = numero % 2;
         numero = numero / 2;
     }
-
-    // Caso numero seja negativo, faço o complemento de 2
+    // Caso valormant seja negativo, faço o complemento de 2
     if (valormant < 0) {
         // Inverto os bits
         for (i = 0; i < 32; i++) {
@@ -169,11 +160,9 @@ int main(){
 
     // Binario big endian
     char bin_big[35];
-
     bin_big[0] = '0';
     bin_big[1] = 'b';
     bin_big[34] = '\n';
-
     for (i = 0; i < 32; i++) {
         bin_big[i + 2] = bin[i] + '0';
     }
@@ -181,14 +170,11 @@ int main(){
 
     // Binario little endian
     char bin_lit[35];
-
     bin_lit[0] = '0';
     bin_lit[1] = 'b';
     bin_lit[34] = '\n';
-
     pos = 2;
     int byte;
-
     for (byte = 3; byte >= 0; byte--) {
         for (i = byte * 8; i < byte * 8 + 8; i++) {
             bin_lit[pos] = bin[i] + '0';
@@ -199,30 +185,27 @@ int main(){
 
     // Converto de binario para hexadecimal
     char hex[8];
-    int grupo_de_4;
+    int grupo_de_4_bits;
     int j;
-
     for (i = 0; i < 8; i++) {
-        grupo_de_4 = 0;
+        grupo_de_4_bits = 0;
         for (j = 0; j < 4; j++) {
-            grupo_de_4 = grupo_de_4 * 2;
-            grupo_de_4 = grupo_de_4 + bin[i * 4 + j];
+            grupo_de_4_bits = grupo_de_4_bits * 2;
+            grupo_de_4_bits = grupo_de_4_bits + bin[i * 4 + j];
         }
-        if (grupo_de_4 < 10) {
-            hex[i] = grupo_de_4 + '0';
+        if (grupo_de_4_bits < 10) {
+            hex[i] = grupo_de_4_bits + '0';
         }
         else {
-            hex[i] = (grupo_de_4 - 10) + 'a';
+            hex[i] = (grupo_de_4_bits - 10) + 'a';
         }
     }
 
     // Hexadecimal big endian
     char hex_big[11];
-
     hex_big[0] = '0';
     hex_big[1] = 'x';
     hex_big[10] = '\n';
-
     for (i = 0; i < 8; i++) {
         hex_big[i + 2] = hex[i];
     }
@@ -233,7 +216,6 @@ int main(){
     hex_lit[0] = '0';
     hex_lit[1] = 'x';
     hex_lit[10] = '\n';
-
     pos = 2;
     for (byte = 3; byte >= 0; byte--) {
         hex_lit[pos] = hex[byte * 2];
